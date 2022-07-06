@@ -5,7 +5,6 @@ import uuid
 
 # Third Party Modules
 from django.contrib.gis.db import models
-from django.contrib.postgres.fields import jsonb
 from django.utils.translation import gettext_lazy as _
 from django_extensions.db.fields import AutoSlugField
 from uuid_upload_path import upload_to
