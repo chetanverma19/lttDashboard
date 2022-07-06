@@ -1,25 +1,17 @@
-from django.db import models
-
 # Create your models here.
 
 # Standard Library
 import uuid
 
-from django.conf import settings
 # Third Party Modules
 from django.contrib.gis.db import models
 from django.contrib.postgres.fields import jsonb
-from django.core.validators import MaxValueValidator, MinValueValidator
-from django.db import transaction
 from django.utils.translation import gettext_lazy as _
-# from phonenumber_field.modelfields import PhoneNumberField
-# from storages.backends.s3boto3 import S3Boto3Storage
-# from uuid_upload_path import upload_to
-# from versatileimagefield.fields import PPOIField, VersatileImageField
+from django_extensions.db.fields import AutoSlugField
+from uuid_upload_path import upload_to
+from versatileimagefield.fields import PPOIField, VersatileImageField
 
-# from farmstock import base
-# from farmstock.base.constant import LOCATION_TYPE_CHOICES, VideoSizeFormat
-# from farmstock.generic_utills.utills import get_choices
+from ltt_dashboard.base.constants import LOCATION_TYPE_CHOICES
 
 
 def custom_slugify_function(value):
@@ -113,7 +105,7 @@ class Country(TimeStampedUUIDModel):
 
 class Location(TimeStampedUUIDModel):
     name = models.CharField(_('Name'), max_length=500)
-    extras = jsonb.JSONField('Extras', null=True)
+    extras = models.JSONField(_('Extras'), null=True)
     latitude = models.DecimalField(decimal_places=5, max_digits=15, blank=True, null=True)
     longitude = models.DecimalField(decimal_places=5, max_digits=15, blank=True, null=True)
     location = models.PointField('Location', db_index=True, spatial_index=True)
@@ -133,20 +125,19 @@ class Location(TimeStampedUUIDModel):
 class Address(TimeStampedUUIDModel):
     address_1 = models.CharField(_('Address line 1'), max_length=100, blank=True)
     address_2 = models.CharField(_('Address line 2'), max_length=100, blank=True)
-    pincode = models.CharField(_('Pincode'), max_length=15, blank=True)
     country = models.ForeignKey(Country, blank=True, null=True, related_name='addresses', on_delete=models.CASCADE)
     location = models.PointField(null=True, blank=True, db_index=True, spatial_index=True)
     location_type = models.CharField('Location Type', max_length=100, choices=LOCATION_TYPE_CHOICES, null=True,
                                      blank=True)
     location_id = models.UUIDField('Location_Id', null=True, blank=True, db_index=True)
-    extras = jsonb.JSONField("Extras", default=dict, null=True, blank=True)
+    extras = models.JSONField("Extras", default=dict, null=True, blank=True)
 
     def __str__(self):
-        return '{village} {pincode}- {line}'.format(village=self.village, pincode=self.pincode, line=self.address_1)
+        return '{country} - {line}'.format(country=self.country, line=self.address_1)
 
     class Meta:
         verbose_name_plural = 'Addresses'
-        ordering = ('village', 'pincode')
+        ordering = ('country', 'address_1')
 
 
 class IPLocation(TimeStampedUUIDModel):
