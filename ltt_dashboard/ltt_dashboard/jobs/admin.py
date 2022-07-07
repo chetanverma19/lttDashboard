@@ -20,6 +20,6 @@ class JobCategoriesAdmin(admin.ModelAdmin):
 class JobAdmin(admin.ModelAdmin):
     list_display = ('name', 'display_name', 'job_type', 'department', 'is_shown', 'is_active')
     list_editable = ('is_shown', 'is_active', )
-    list_filter = ('job_type', 'department', )
+    list_filter = ('job_type__display_name', 'department__display_name', )
     filter_horizontal = ('categories', )
     search_fields = ('name', 'display_name', )

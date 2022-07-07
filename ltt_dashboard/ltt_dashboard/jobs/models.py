@@ -16,11 +16,17 @@ class JobType(TimeStampedUUIDModel):
     identifier = models.CharField(_("Identifier"), max_length=50, choices=JOB_TYPE_CHOICES, null=False)
     is_active = models.BooleanField(default=True)
 
+    def __str__(self):
+        return self.display_name
+
 
 class JobCategories(TimeStampedUUIDModel):
     name = models.CharField(max_length=100, db_index=True, unique=True)
     display_name = models.CharField(max_length=100, unique=True)
     is_active = models.BooleanField(default=True)
+
+    def __str__(self):
+        return self.display_name
 
     class Meta:
         verbose_name = 'Job Category'

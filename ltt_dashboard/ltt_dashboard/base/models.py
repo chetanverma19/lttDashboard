@@ -84,7 +84,7 @@ class Country(TimeStampedUUIDModel):
     radius = models.IntegerField(_('Radius'), blank=True, null=True)
 
     def __str__(self):
-        return self.name
+        return self.eng_name
 
     def get_full_name(self):
         _all_india_name = 'भारत'

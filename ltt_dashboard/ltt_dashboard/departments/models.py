@@ -16,3 +16,6 @@ class Department(TimeStampedUUIDModel):
     order = models.IntegerField(db_index=True, default=0)
     is_shown = models.BooleanField(default=True)
     is_active = models.BooleanField(default=True, db_index=True)
+
+    def __str__(self):
+        return self.display_name
