@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'ltt_dashboard.base',
     'ltt_dashboard.departments',
+    'ltt_dashboard.jobs',
 ]
 
 MIDDLEWARE = [
