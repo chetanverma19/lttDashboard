@@ -8,6 +8,16 @@ db.sqlite3
 
 *.pyc
 
+*/*/*/.idea/
+
+*/*/.idea/
+
+*/.idea/
+
+.idea/
+
+../.idea/
+
 */*/*/__pycache__/
 
 */*/__pycache__/
