@@ -41,8 +41,9 @@ class UserAdmin(AuthUserAdmin):
     readonly_fields = ('date_joined', 'last_login', )
     form = MyUserChangeForm
     add_form = MyUserCreationForm
-    list_display = ('email', 'user_name', 'is_active', 'modified_at', )
+    list_display = ('email', 'user_name', 'is_active', 'is_staff', 'modified_at', )
     list_filter = ('is_superuser', 'is_active')
+    list_editable = ('is_staff', 'is_active', )
     search_fields = ('full_name', 'email', 'user_name')
     ordering = ('-date_joined',)
     list_per_page = 10

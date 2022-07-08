@@ -50,7 +50,7 @@ class UserAuthViewset(viewsets.GenericViewSet):
         return response.Ok(data=user_data, status=status.HTTP_201_CREATED)
 
     @action(detail=False, methods=['get'], url_path='verify-email')
-    def verify_user_email(self,request):
+    def verify_user_email(self, request):
         token = request.GET.get('token')
         try:
             payload = jwt.decode(token, settings.SECRET_KEY, algorithms=['HS256'])

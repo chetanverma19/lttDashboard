@@ -15,6 +15,7 @@ class JobType(TimeStampedUUIDModel):
     display_name = models.CharField(_("Display Name"), max_length=100)
     identifier = models.CharField(_("Identifier"), max_length=50, choices=JOB_TYPE_CHOICES, null=False)
     is_active = models.BooleanField(default=True)
+    objects = models.Manager()
 
     def __str__(self):
         return self.display_name
@@ -24,6 +25,7 @@ class JobCategories(TimeStampedUUIDModel):
     name = models.CharField(max_length=100, db_index=True, unique=True)
     display_name = models.CharField(max_length=100, unique=True)
     is_active = models.BooleanField(default=True)
+    objects = models.Manager()
 
     def __str__(self):
         return self.display_name
@@ -43,4 +45,5 @@ class Job(TimeStampedUUIDModel):
     categories = models.ManyToManyField(JobCategories, related_name='job_type', null=True, blank=True)
     is_shown = models.BooleanField(default=True)
     is_active = models.BooleanField(default=True)
+    objects = models.Manager()
 
