@@ -3,6 +3,7 @@ from django.contrib.auth.models import PermissionsMixin
 from django.contrib.gis.db import models
 from django.utils.translation import gettext_lazy as _
 from datetime import datetime
+from rest_framework_simplejwt.tokens import RefreshToken
 
 # Create your models here.
 from ltt_dashboard.base.models import TimeStampedUUIDModel, ImageMixin
@@ -68,7 +69,11 @@ class User(AbstractBaseUser, ImageMixin, PermissionsMixin, TimeStampedUUIDModel,
         return self.email
 
     def tokens(self):
-        return ''
+        token = RefreshToken.for_user(self)
+        return {
+            "refresh": str(token),
+            "access": str(token.access_token)
+        }
 
 
 class SocialAuth(TimeStampedUUIDModel):

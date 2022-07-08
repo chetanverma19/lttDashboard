@@ -1,97 +1,150 @@
-
+import jwt
 from django.shortcuts import render
 
 # Standard Library
 import logging
-from rest_framework import generics, status
 
-from django.contrib.auth import get_user_model
-from django.contrib.gis.db.models.functions import Distance
-from django.contrib.gis.geos import Point
-from django.utils import timezone
-from rest_framework import exceptions, mixins, permissions, viewsets, decorators
-# farmstock Modules
+from django.urls import reverse
+from rest_framework import generics, status, views, viewsets
 from rest_framework.decorators import action
+from rest_framework_simplejwt.tokens import RefreshToken
+from django.contrib.auth import get_user_model
+from django.contrib.sites.shortcuts import get_current_site
+from django.conf import settings
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
 
 from ltt_dashboard import response
-from . import serializers
-from .serializers import UserRegisterSerializer
+from ltt_dashboard.users.utils import Util
+from .serializers import UserRegisterSerializer, UserVerificationSerializer, LoginSerializer
 
 User = get_user_model()
 logger = logging.getLogger(__name__)
 
 
-class UserRegisterView(generics.GenericAPIView):
+class UserAuthViewset(viewsets.GenericViewSet):
 
-    serializer_class = UserRegisterSerializer
-
-    def post(self, request):
-
+    @action(detail=False, methods=['post'], url_path='register')
+    def register_user(self, request):
         user = request.data
-        print('Called')
-        serializer = self.serializer_class(data=user)
-        print('Serialized')
+        serializer = UserRegisterSerializer(data=user)
         serializer.is_valid(raise_exception=True)
         serializer.save()
 
         user_data = serializer.data
 
+        user = User.objects.get(email=user_data['email'])
+        token = RefreshToken.for_user(user).access_token
+        current_site = get_current_site(request).domain
+        relativeLink = reverse('verify-email')
+        abs_url = f"http://{current_site}{relativeLink}?token={str(token)}"
+        email_body = Util.create_verify_message_for_user(user_data, abs_url)
+        user_email = user_data.get('email')
+        data = {
+            "email_body": email_body,
+            "email_subject": "Verify your account",
+            "to_mail": user_email
+        }
+        Util.send_email(data)
+
         return response.Ok(data=user_data, status=status.HTTP_201_CREATED)
 
+    @action(detail=False, methods=['get'], url_path='verify-email')
+    def verify_user_email(self,request):
+        token = request.GET.get('token')
+        try:
+            payload = jwt.decode(token, settings.SECRET_KEY, algorithms=['HS256'])
+            user = User.objects.filter(id=payload['user_id']).first()
+            if not user.is_verified:
+                user.is_verified = True
+                user.save()
+            msg = Util.get_successful_verification_message()
+            response_status = status.HTTP_200_OK
+        except jwt.ExpiredSignatureError as error:
+            msg = Util.get_timeout_verification_message(error)
+            response_status = status.HTTP_400_BAD_REQUEST
+        except jwt.exceptions.DecodeError as error:
+            msg = Util.get_invalid_token_error(error)
+            response_status = status.HTTP_400_BAD_REQUEST
+        return response.Ok(data=msg, status=response_status)
+
+    @action(detail=False, methods=['post'], url_path='login')
+    def user_login(self, request):
+        serializer = LoginSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        return response.Ok(data=serializer.data, status=status.HTTP_200_OK)
 
 
-# class CurrentUserViewSet(viewsets.GenericViewSet):
-#     """
-#     list:
-#     Get current logged-in user profile
+
+
+# class UserRegisterView(generics.GenericAPIView):
+#     serializer_class = UserRegisterSerializer
 #
-#     update:
-#     Update current logged-in user profile
-#     """
-#     serializer_class = serializers.UserAuthSerializer
-#     queryset = User.objects.filter(is_active=True)
-#     point_param = 'point'
-#     point_param_required = True
-#
-#     def list(self, request):
-#         """Get logged in user profile"""
-#         serializer = self.get_serializer(self.get_object())
-#         return response.Ok(serializer.data)
-#
-#     def partial_update(self, request):
-#         """Update logged in user profile"""
-#         logger.debug("In User Partial Update")
-#         logger.debug(request.data)
-#         instance = self.get_object()
-#         serializer = self.get_serializer(instance, data=request.data, partial=True)
+#     def post(self, request):
+#         user = request.data
+#         serializer = self.serializer_class(data=user)
 #         serializer.is_valid(raise_exception=True)
 #         serializer.save()
-#         return response.Ok(serializer.data)
+#
+#         user_data = serializer.data
+#
+#         user = User.objects.get(email=user_data['email'])
+#
+#         current_site = get_current_site(request).domain
+#         relative_link = reverse('verify-email')
+#         token = RefreshToken.for_user(user)
+#
+#         print(token)
+#         print(token.access_token)
+#
+#         current_site = get_current_site(request).domain
+#         relativeLink = reverse('verify-email')
+#         abs_url = 'http://' + current_site + relativeLink + "?token=" + str(token)
+#         email_body = Util.create_verify_message_for_user(user_data, abs_url)
+#         user_email = user_data.get('email')
+#         data = {
+#             "email_body": email_body,
+#             "email_subject": "Verify your account",
+#             "to_mail": user_email
+#         }
+#         Util.send_email(data)
+#
+#         return response.Ok(data=user_data, status=status.HTTP_201_CREATED)
 #
 #
-# class UserViewSet(mixins.RetrieveModelMixin, viewsets.GenericViewSet):
-#     serializer_class = serializers.SimpleUserSerializer
-#     queryset = User.objects.filter(is_active=True)
-#     permission_classes = (permissions.AllowAny,)
+# class VerifyEmail(views.APIView):
+#     serializer_class = UserVerificationSerializer
 #
-#     def get_queryset(self):
-#         return self.queryset.select_related('address__village__block__district__state'). \
-#             prefetch_related('user_topics', 'user_crops')
+#     token_param_config = openapi.Parameter('token', in_=openapi.IN_QUERY, description='Description',
+#                                            type=openapi.TYPE_STRING)
 #
-#     @decorators.action(detail=False, url_path='register-location')
-#     def register_location(self, request, *args, **kwargs):
-#         rl_serializer = RegisterLocationSerializer(data=request.GET, context={REQUEST_PARAM: Request(request)})
-#         rl_serializer.is_valid(raise_exception=True)
-#         out = rl_serializer.save()
-#         return response.Ok(data=out)
+#     @swagger_auto_schema(manual_parameters=[token_param_config], )
+#     def get(self, request):
+#         token = request.GET.get('token')
+#         try:
+#             payload = jwt.decode(token, settings.SECRET_KEY, algorithms=['HS256'])
+#             user = User.objects.filter(id=payload['user_id']).first()
+#             if not user.is_verified:
+#                 user.is_verified = True
+#                 user.save()
+#             msg = Util.get_successful_verification_message()
+#             response_status = status.HTTP_200_OK
+#         except jwt.ExpiredSignatureError as error:
+#             msg = Util.get_timeout_verification_message(error)
+#             response_status = status.HTTP_400_BAD_REQUEST
+#         except jwt.exceptions.DecodeError as error:
+#             msg = Util.get_invalid_token_error(error)
+#             response_status = status.HTTP_400_BAD_REQUEST
+#         return response.Ok(data=msg, status=response_status)
 #
-#     @decorators.action(detail=False, methods=['post'], url_path='update-cached-details')
-#     def update_user_cached_details(self, request, *args, **kwargs):
-#         data = request.data
-#         user_id_list = data.get('user_id_list', [])
-#         is_celery_task = data.get("is_celery_task")
-#         if is_celery_task:
-#             update_user_id_detail_list_task.delay(user_id_list)
-#         else:
-#             update_user_id_detail_list(user_id_list)
-#         return response.Ok()
+#
+# class LoginAPIView(generics.GenericAPIView):
+#
+#     serializer_class = LoginSerializer
+#
+#     def post(self, request):
+#         serializer = self.serializer_class(data=request.data)
+#         serializer.is_valid(raise_exception=True)
+#
+#         return response.Ok(data=serializer.data, status=status.HTTP_200_OK)
