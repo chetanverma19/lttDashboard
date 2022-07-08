@@ -6,8 +6,8 @@ from rest_framework import permissions
 from ltt_dashboard import response
 
 # Create your views here.
-from ltt_dashboard.jobs.models import Job
-from ltt_dashboard.jobs.serializers import JobSerializer
+from ltt_dashboard.jobs.models import Job, JobApplication
+from ltt_dashboard.jobs.serializers import JobSerializer, JobApplicationSerializer
 
 
 class JobViewSet(viewsets.GenericViewSet):
@@ -33,3 +33,13 @@ class JobViewSet(viewsets.GenericViewSet):
         response_data = JobSerializer(job_list, many=True).data
 
         return response.Ok(data=response_data, status=status.HTTP_200_OK)
+
+    @action(detail=False, methods=['get'], url_path='application-list')
+    def get_list_of_own_application(self, request):
+        user = request.user
+        job_application_list = JobApplication.objects.filter(user__id=user.id, is_active=True).all()
+
+        response_data = JobApplicationSerializer(job_application_list, many=True).data
+
+        return response.Ok(data=response_data, status=status.HTTP_200_OK)
+

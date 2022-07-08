@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from ltt_dashboard.departments.serializers import DepartmentSerializer
-from ltt_dashboard.jobs.models import Job, JobType, JobCategories
+from ltt_dashboard.jobs.models import Job, JobType, JobCategories, JobApplication
 
 
 class JobTypeSerializer(serializers.ModelSerializer):
@@ -27,3 +27,12 @@ class JobSerializer(serializers.ModelSerializer):
     class Meta:
         model = Job
         fields = ['name', 'display_name', 'description', 'job_type', 'department', 'categories', ]
+
+
+class JobApplicationSerializer(serializers.ModelSerializer):
+
+    job = JobSerializer()
+
+    class Meta:
+        model = JobApplication
+        fields = ['job', ]
