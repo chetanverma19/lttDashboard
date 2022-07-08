@@ -29,6 +29,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+AUTH_USER_MODEL = 'users.User'
 
 # Application definition
 
@@ -39,9 +40,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'versatileimagefield',
     'ltt_dashboard.base',
     'ltt_dashboard.departments',
     'ltt_dashboard.jobs',
+    'ltt_dashboard.users',
 ]
 
 MIDDLEWARE = [
@@ -94,6 +97,12 @@ DATABASES = {
 DATABASES['default']['ATOMIC_REQUESTS'] = True
 DATABASES['default']['CONN_MAX_AGE'] = 10
 
+REST_FRAMEWORK = {
+    'NON_FIELD_ERRORS_KEY': 'error',
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    )
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators
@@ -132,3 +141,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
 STATIC_URL = '/static/'
+
+EMAIL_USE_TLS = True
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = env.str('EMAIL_HOST_USER', default='admin')
+EMAIL_HOST_PASSWORD = env.str('EMAIL_HOST_PASSWORD', default='admin')

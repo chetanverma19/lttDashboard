@@ -25,4 +25,4 @@ urlpatterns = [
 
 urlpatterns += [
     re_path(r'^api/v1/', include(api_urls)),
-               ]
+]
