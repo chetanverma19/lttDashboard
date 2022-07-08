@@ -8,6 +8,7 @@ from django.utils.translation import gettext_lazy as _
 from ltt_dashboard.base.models import TimeStampedUUIDModel
 from ltt_dashboard.departments.models import Department
 from ltt_dashboard.jobs.constants import JOB_TYPE_CHOICES
+from ltt_dashboard.users.models import User
 
 
 class JobType(TimeStampedUUIDModel):
@@ -46,4 +47,22 @@ class Job(TimeStampedUUIDModel):
     is_shown = models.BooleanField(default=True)
     is_active = models.BooleanField(default=True)
     objects = models.Manager()
+
+    def __str__(self):
+        return self.display_name
+
+
+class JobApplication(TimeStampedUUIDModel):
+    job = models.ForeignKey(Job, related_name='job_application', on_delete=models.DO_NOTHING, null=False)
+    user = models.ForeignKey(User, related_name='user_application', on_delete=models.DO_NOTHING, null=False)
+    is_active = models.BooleanField(default=True)
+    objects = models.Manager()
+
+    def __str__(self):
+        return "{} - {}".format(self.job.display_name, self.user.email)
+
+    class Meta:
+        unique_together = ('job', 'user')
+
+
 
