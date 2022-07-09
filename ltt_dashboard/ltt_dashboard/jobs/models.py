@@ -65,4 +65,14 @@ class JobApplication(TimeStampedUUIDModel):
         unique_together = ('job', 'user')
 
 
+class JobExtraField(TimeStampedUUIDModel):
+    job = models.ForeignKey(Job, related_name='job_extra', on_delete=models.DO_NOTHING, null=False)
+    heading = models.CharField(_("Heading"), max_length=50)
+    description = models.TextField(_("Description"), max_length=1024)
+    is_active = models.BooleanField(default=True)
+
+    def __str__(self):
+        return self.heading
+
+
 
