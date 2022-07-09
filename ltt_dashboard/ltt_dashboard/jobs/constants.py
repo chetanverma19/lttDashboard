@@ -7,3 +7,17 @@ JOB_TYPE_CHOICES = {
     (PART_TIME, "Part Time"),
     (INTERNSHIP, "Internship"),
 }
+
+NEW_APPLICANT = 'new_applicant'
+IN_PROCESS = 'in_process'
+RESERVED = 'reserved'
+SELECTED = 'selected'
+REJECTED = 'rejected'
+
+APPLICATION_STAGE_CHOICES = {
+    (NEW_APPLICANT, "New Application"),
+    (IN_PROCESS, "In Process"),
+    (RESERVED, "Reserved"),
+    (SELECTED, "Selected"),
+    (REJECTED, "Rejected"),
+}
