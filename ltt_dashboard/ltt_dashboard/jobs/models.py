@@ -14,9 +14,8 @@ from ltt_dashboard.users.models import User
 
 
 class JobType(TimeStampedUUIDModel):
-    name = models.CharField(_("Name"), max_length=100)
-    display_name = models.CharField(_("Display Name"), max_length=100)
-    identifier = models.CharField(_("Identifier"), max_length=50, choices=JOB_TYPE_CHOICES, null=False)
+    name = models.CharField(_("Name"), max_length=100, unique=True)
+    display_name = models.CharField(_("Display Name"), max_length=100, unique=True)
     is_active = models.BooleanField(default=True)
     objects = models.Manager()
 

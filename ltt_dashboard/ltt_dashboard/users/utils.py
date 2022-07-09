@@ -8,7 +8,9 @@ class Util:
         email_subject = data.get('email_subject')
         email_body = data.get('email_body')
         to_mail = data.get('to_mail')
-        email = EmailMessage(subject=email_subject, body=email_body, to=[to_mail])
+        if not isinstance(to_mail, list):
+            to_mail = [to_mail]
+        email = EmailMessage(subject=email_subject, body=email_body, to=to_mail)
         email.send()
 
     @staticmethod
@@ -17,6 +19,30 @@ class Util:
         if not user_full_name:
             user_full_name = "New User"
         return f"Hi {user_full_name},\nPlease verify your account using the following link:\n{verification_url}"
+
+    @staticmethod
+    def get_rejection_email(user_name, job_name):
+        mail = {
+            "email_subject": f"{job_name} Application Update",
+            "email_body": f"Dear {user_name},\n\nWe regret to inform you but at this moment we have decided not to move"
+                          f" forward with you application for the position of {job_name}. We appreciate for selecting "
+                          f"LMG for your future endeavours.\n\nPlease feel free to try apply for more open positions "
+                          f"available on our website at https://linusmediagroup.com/jobs\n\nThank You\nLinus Media "
+                          f"Group"
+        }
+        return mail
+
+    @staticmethod
+    def get_mass_rejection_email(job_name):
+        mail = {
+            "email_subject": f"{job_name} Application Update",
+            "email_body": f"Dear Candidate,\n\nWe regret to inform you but at this moment we have decided not to move"
+                          f" forward with you application for the position of {job_name}. We appreciate for selecting "
+                          f"LMG for your future endeavours.\n\nPlease feel free to try apply for more open positions "
+                          f"available on our website at https://linusmediagroup.com/jobs\n\nThank You\nLinus Media "
+                          f"Group"
+        }
+        return mail
 
     @staticmethod
     def get_successful_verification_message():
