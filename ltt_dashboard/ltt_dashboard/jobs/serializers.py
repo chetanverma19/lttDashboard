@@ -1,8 +1,12 @@
+from django_countries.serializer_fields import CountryField
 from rest_framework import serializers
+from django_countries import serializer_fields
 
+from ltt_dashboard.base.serializers import AddressSerializer
 from ltt_dashboard.departments.models import Department
 from ltt_dashboard.departments.serializers import DepartmentSerializer
 from ltt_dashboard.jobs.models import Job, JobType, JobCategories, JobApplication
+from ltt_dashboard.users.models import User
 
 
 class JobTypeSerializer(serializers.ModelSerializer):
@@ -33,10 +37,16 @@ class JobSerializer(serializers.ModelSerializer):
 class JobApplicationSerializer(serializers.ModelSerializer):
 
     job = JobSerializer()
+    country = serializers.SerializerMethodField()
 
     class Meta:
         model = JobApplication
-        fields = ['job', ]
+        fields = ['job', 'country', 'email', 'phone_number', 'resume', 'applicant_message', 'last_staff_note',
+                  'application_status']
+
+    @staticmethod
+    def get_country(obj: JobApplication):
+        return obj.country.name
 
 
 class JobListRequestSerializer(serializers.Serializer):
@@ -80,4 +90,26 @@ class JobListRequestSerializer(serializers.Serializer):
         return attrs
 
 
+class JobCreateUpdateSerializer(serializers.ModelSerializer):
 
+    job = serializers.UUIDField()
+    country = CountryField(required=False)
+    email = serializers.EmailField(required=False)
+    phone_number = serializers.CharField(required=False)
+    resume = serializers.FileField(required=False)
+    applicant_message = serializers.CharField(required=False)
+
+    class Meta:
+        model = JobApplication
+        fields = ['job', 'address', 'email', 'phone_number', 'resume', 'applicant_message', 'last_staff_note',
+                  'application_status', 'country']
+
+    def validate(self, attrs):
+        user = self.context.get('request').user
+        if not Job.objects.filter(id=attrs['job']).exists():
+            raise serializers.ValidationError("Invalid Job ID")
+        user = User.objects.filter(id=user.id).first()
+        email = attrs.get('email')
+        if not email:
+            attrs['email'] = user.email
+        return attrs

@@ -4,6 +4,7 @@ from django.db import models
 
 from django.contrib.gis.db import models
 from django.utils.translation import gettext_lazy as _
+from django_countries.fields import CountryField
 from uuid_upload_path import upload_to
 
 from ltt_dashboard.base.models import TimeStampedUUIDModel, Address
@@ -59,6 +60,7 @@ class JobApplication(TimeStampedUUIDModel):
     user = models.ForeignKey(User, related_name='user_application', on_delete=models.DO_NOTHING, null=False)
     address = models.ForeignKey(Address, related_name='address_application', on_delete=models.DO_NOTHING, null=True,
                                 blank=True)
+    country = CountryField()
     email = models.EmailField(_('Email Address'), null=True, blank=True, db_index=True, )
     phone_number = models.CharField(_('phone number'), null=True, blank=True, db_index=True, max_length=15,
                                     help_text='Include the country code.')

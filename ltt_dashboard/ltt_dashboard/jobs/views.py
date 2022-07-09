@@ -2,12 +2,15 @@ from django.shortcuts import render
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework import permissions
+from uuid_upload_path import upload_to
 
 from ltt_dashboard import response
 
 # Create your views here.
 from ltt_dashboard.jobs.models import Job, JobApplication
-from ltt_dashboard.jobs.serializers import JobSerializer, JobApplicationSerializer, JobListRequestSerializer
+from ltt_dashboard.jobs.serializers import JobSerializer, JobApplicationSerializer, JobListRequestSerializer, \
+    JobCreateUpdateSerializer
+from ltt_dashboard.users.models import User
 
 
 class JobViewSet(viewsets.GenericViewSet):
@@ -52,4 +55,37 @@ class JobViewSet(viewsets.GenericViewSet):
         response_data = JobApplicationSerializer(job_application_list, many=True).data
 
         return response.Ok(data=response_data, status=status.HTTP_200_OK)
+
+    @action(detail=False, methods=['post', 'delete'], url_path='application-create-update')
+    def update_user_application(self, request):
+        user = request.user
+        context = {'request': request}
+        serializer = JobCreateUpdateSerializer(data=request.data, context=context)
+        if not serializer.is_valid():
+            return response.Ok(data={"error": "Invalid Application Request"}, status=status.HTTP_400_BAD_REQUEST)
+        validated_data = serializer.data
+        application_job = Job.objects.filter(id=validated_data['job']).first()
+        validated_data['job'] = application_job
+        validated_data['user'] = User.objects.filter(id=user.id).first()
+        resume = request.FILES.get('resume')
+        if resume:
+            validated_data['resume'] = resume
+        query_set = JobApplication.objects.filter(job=application_job, user__id=user.id)
+        if request.method == 'DELETE':
+            if query_set.exists():
+                query_set.delete()
+                return response.Ok(status=status.HTTP_200_OK)
+            else:
+                return response.Ok(data={"error": "The application you are trying to delete does not exist for this"
+                                                  "user"}, status=status.HTTP_410_GONE)
+
+        elif query_set.exists():
+            query_set.update(**validated_data)
+        else:
+            JobApplication.objects.update_or_create(**validated_data)
+        return response.Ok(status=status.HTTP_202_ACCEPTED)
+
+
+
+
 
