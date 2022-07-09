@@ -38,8 +38,8 @@ class JobCategories(TimeStampedUUIDModel):
 
 
 class Job(TimeStampedUUIDModel):
-    name = models.CharField(_("Name"), max_length=100, db_index=True)
-    display_name = models.CharField(_("Display Name"), max_length=100)
+    name = models.CharField(_("Name"), max_length=100, db_index=True, unique=True)
+    display_name = models.CharField(_("Display Name"), max_length=100, unique=True)
     description = models.TextField(_("Description"), max_length=1024)
     job_type = models.ForeignKey(JobType, related_name='job_type', on_delete=models.SET_NULL, null=True, blank=True)
     department = models.ForeignKey(Department, related_name='job_type', on_delete=models.SET_NULL, null=True,
@@ -83,6 +83,7 @@ class JobExtraField(TimeStampedUUIDModel):
     heading = models.CharField(_("Heading"), max_length=50)
     description = models.TextField(_("Description"), max_length=1024)
     is_active = models.BooleanField(default=True)
+    objects = models.Manager()
 
     def __str__(self):
         return self.heading

@@ -182,3 +182,30 @@ class EntityActionSerializer(serializers.Serializer):
         if entity_type not in ['department', 'job_type', 'job_categories']:
             raise serializers.ValidationError('Invalid Entity Type')
         return attrs
+
+
+class JobActionSerializer(serializers.Serializer):
+    name = serializers.CharField()
+    display_name = serializers.CharField()
+    description = serializers.CharField()
+    job_type = serializers.CharField()
+    department = serializers.CharField()
+    categories = serializers.ListField()
+    is_remote = serializers.BooleanField(required=False)
+    extra_fields = serializers.ListField(required=False)
+
+    def validate(self, attrs):
+        job_type = attrs.get('job_type')
+        department = attrs.get('department')
+        categories_id_list = attrs.get('categories')
+
+        if not JobType.objects.filter(id=job_type).exists():
+            raise serializers.ValidationError('Invalid Job Type')
+        if not Department.objects.filter(id=department).exists():
+            raise serializers.ValidationError('Invalid Department')
+        if categories_id_list:
+            query_set = JobCategories.objects.filter(id__in=categories_id_list)
+            if query_set.count() != len(categories_id_list):
+                raise serializers.ValidationError('Invalid Job Categories')
+
+        return attrs

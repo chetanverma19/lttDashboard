@@ -9,12 +9,13 @@ from uuid_upload_path import upload_to
 from ltt_dashboard import response
 from ltt_dashboard.departments.models import Department
 from ltt_dashboard.jobs.constants import REJECTED, SELECTED, RESERVED
-from ltt_dashboard.jobs.models import Job, JobApplication, JobType, JobCategories
+from ltt_dashboard.jobs.models import Job, JobApplication, JobType, JobCategories, JobExtraField
 from ltt_dashboard.jobs.serializers import JobSerializer, JobApplicationSerializer, JobListRequestSerializer, \
     JobCreateUpdateSerializer, ApplicationListRequestSerializer, UpdateApplicationSerializer, JobCloseRequestSerializer, \
-    EntityActionSerializer
+    EntityActionSerializer, JobActionSerializer
 from ltt_dashboard.users.models import User
 from ltt_dashboard.users.utils import Util
+
 
 class JobViewSet(viewsets.GenericViewSet):
     permission_classes = (permissions.IsAuthenticated,)
@@ -103,7 +104,7 @@ class JobViewSet(viewsets.GenericViewSet):
 
 
 class JobManagementViewset(viewsets.GenericViewSet):
-    permission_classes = (permissions.IsAuthenticated, permissions.IsAdminUser, )
+    permission_classes = (permissions.IsAuthenticated, permissions.IsAdminUser,)
     queryset = ''
 
     @action(detail=False, methods=['post'], url_path='application-list')
@@ -183,6 +184,8 @@ class JobManagementViewset(viewsets.GenericViewSet):
         if not withhold_email:
             email.update({"to_mail": rejected_applicant_email_list})
             Util.send_email(email)
+        job.is_active = False
+        job.save()
         return response.Ok(data={"job_status": "closed", "emails_withheld": withhold_email}, status=status.HTTP_200_OK)
 
     @action(detail=False, methods=['post', 'delete'], url_path='entity-action')
@@ -211,14 +214,84 @@ class JobManagementViewset(viewsets.GenericViewSet):
                 model = JobType
             elif entity_type == 'job_categories':
                 model = JobCategories
-            if model.objects.filter(name=entity_name).exists() or model.objects.filter(display_name=entity_display_name).exists():
+            if model.objects.filter(name=entity_name).exists() or model.objects.filter(
+                    display_name=entity_display_name).exists():
                 return response.Ok(data={"error": "Entity Already Exists"}, status=status.HTTP_400_BAD_REQUEST)
             entity_obj = model.objects.create(name=entity_name, display_name=entity_display_name)
             entity_obj.save()
         return response.Ok(status=status.HTTP_200_OK)
 
+    @action(detail=False, methods=['post', 'delete'], url_path='job-action')
+    def job_action(self, request, *args, **kwargs):
+        serializer = JobActionSerializer(data=request.data)
+        if not serializer.is_valid():
+            return response.Ok(status=status.HTTP_400_BAD_REQUEST)
+        validated_data = serializer.data
+        name = validated_data.get('name')
+        display_name = validated_data.get('display_name')
+        description = validated_data.get('description')
+        job_type = validated_data.get('job_type')
+        department = validated_data.get('department')
+        categories = validated_data.get('categories')
+        is_remote = validated_data.get('is_remote')
+        extra_fields = validated_data.get('extra_fields')
+        if request.method == 'POST':
+            tmp_job_obj = Job.objects.filter(name=name, display_name=display_name).first()
+            if tmp_job_obj:
+                JobExtraField.objects.filter(job=tmp_job_obj).delete()
+                tmp_job_obj.delete()
+                job_type = JobType.objects.filter(id=job_type).first()
+                department = Department.objects.filter(id=department).first()
+                categories = JobCategories.objects.filter(id__in=categories).all()
+                job_obj: Job = Job(
+                    name=name,
+                    display_name=display_name,
+                    description=description,
+                    job_type=job_type,
+                    department=department,
+                    is_remote=is_remote,
+                )
+                job_obj.categories.set(categories)
+                job_obj.save()
+                if extra_fields:
+                    for extra_field in extra_fields:
+                        JobExtraField.objects.create(
+                            job=job_obj,
+                            heading=extra_field.get('heading'),
+                            description=extra_field.get('description')
+                        )
+                return response.Ok(data={"message": f"{display_name} updated"}, status=status.HTTP_200_OK)
 
+            elif Job.objects.filter(name=name).exists() or Job.objects.filter(display_name=display_name).exists():
+                return response.Ok(data={"error": "Conflicting Job Already Exists"}, status=status.HTTP_400_BAD_REQUEST)
+            else:
+                job_type = JobType.objects.filter(id=job_type).first()
+                department = Department.objects.filter(id=department).first()
+                categories = JobCategories.objects.filter(id__in=categories).all()
+                job_obj: Job = Job(
+                    name=name,
+                    display_name=display_name,
+                    description=description,
+                    job_type=job_type,
+                    department=department,
+                    is_remote=is_remote,
+                )
+                job_obj.categories.set(categories)
+                job_obj.save()
+                if extra_fields:
+                    for extra_field in extra_fields:
+                        JobExtraField.objects.create(
+                            job=job_obj,
+                            heading=extra_field.get('heading'),
+                            description=extra_field.get('description')
+                        )
+                return response.Ok(data={"message": f"{display_name} created"}, status=status.HTTP_201_CREATED)
 
-
-
-
+        if request.method == 'DELETE':
+            job_obj = Job.objects.filter(name=name, display_name=display_name).first()
+            if not job_obj:
+                return response.Ok(data={"error": "No Such Job Exists"}, status=status.HTTP_400_BAD_REQUEST)
+            job_name = job_obj.display_name
+            JobExtraField.objects.filter(job=job_obj).delete()
+            job_obj.delete()
+            return response.Ok(data={"message": f"{job_name} deleted"}, status=status.HTTP_200_OK)
