@@ -14,7 +14,7 @@ class JobTypeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = JobType
-        fields = ['name', 'display_name', 'identifier']
+        fields = ['name', 'display_name']
 
 
 class JobCategoriesSerializer(serializers.ModelSerializer):
@@ -176,6 +176,16 @@ class EntityActionSerializer(serializers.Serializer):
     entity_type = serializers.CharField()
     entity_name = serializers.CharField()
     entity_display_name = serializers.CharField()
+
+    def validate(self, attrs):
+        entity_type = attrs.get('entity_type')
+        if entity_type not in ['department', 'job_type', 'job_categories']:
+            raise serializers.ValidationError('Invalid Entity Type')
+        return attrs
+
+
+class EntityListSerializer(serializers.Serializer):
+    entity_type = serializers.CharField()
 
     def validate(self, attrs):
         entity_type = attrs.get('entity_type')

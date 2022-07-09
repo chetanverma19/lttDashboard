@@ -8,11 +8,12 @@ from uuid_upload_path import upload_to
 
 from ltt_dashboard import response
 from ltt_dashboard.departments.models import Department
+from ltt_dashboard.departments.serializers import DepartmentSerializer
 from ltt_dashboard.jobs.constants import REJECTED, SELECTED, RESERVED
 from ltt_dashboard.jobs.models import Job, JobApplication, JobType, JobCategories, JobExtraField
 from ltt_dashboard.jobs.serializers import JobSerializer, JobApplicationSerializer, JobListRequestSerializer, \
     JobCreateUpdateSerializer, ApplicationListRequestSerializer, UpdateApplicationSerializer, JobCloseRequestSerializer, \
-    EntityActionSerializer, JobActionSerializer
+    EntityActionSerializer, JobActionSerializer, JobTypeSerializer, JobCategoriesSerializer, EntityListSerializer
 from ltt_dashboard.users.models import User
 from ltt_dashboard.users.utils import Util
 
@@ -102,6 +103,26 @@ class JobViewSet(viewsets.GenericViewSet):
             JobApplication.objects.update_or_create(**validated_data)
         return response.Ok(status=status.HTTP_202_ACCEPTED)
 
+    @action(detail=False, methods=['get'], url_path='entity-list')
+    def entity_list(self, request, *args, **kwargs):
+        entity_type = request.GET.get('entity_type')
+        if not entity_type or entity_type not in ['department', 'job_type', 'job_categories']:
+            return response.Ok(data={"error": "Invalid Entity Type"}, status=status.HTTP_400_BAD_REQUEST)
+        curr_model = ''
+        curr_serializer = ''
+        if entity_type == 'department':
+            curr_model = Department
+            curr_serializer = DepartmentSerializer
+        elif entity_type == 'job_type':
+            curr_model = JobType
+            curr_serializer = JobTypeSerializer
+        elif entity_type == 'job_categories':
+            curr_model = JobCategories
+            curr_serializer = JobCategoriesSerializer
+        curr_model_obj_list = curr_model.objects.filter(is_active=True).all()
+        response_data = curr_serializer(curr_model_obj_list, many=True).data
+        return response.Ok(data=response_data, status=status.HTTP_200_OK)
+
 
 class JobManagementViewset(viewsets.GenericViewSet):
     permission_classes = (permissions.IsAuthenticated, permissions.IsAdminUser,)
@@ -190,7 +211,7 @@ class JobManagementViewset(viewsets.GenericViewSet):
 
     @action(detail=False, methods=['post', 'delete'], url_path='entity-action')
     def entity_action(self, request, *args, **kwargs):
-        serializer = EntityActionSerializer(data=request.data)
+        serializer = EntityListSerializer(data=request.data)
         if not serializer.is_valid():
             return response.Ok(status=status.HTTP_400_BAD_REQUEST)
         validated_data = serializer.data
