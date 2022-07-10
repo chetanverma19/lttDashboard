@@ -104,7 +104,7 @@ class JobCreateUpdateSerializer(serializers.ModelSerializer):
 
     def validate(self, attrs):
         user = self.context.get('request').user
-        if not Job.objects.filter(id=attrs['job']).exists():
+        if not Job.objects.filter(id=attrs.get('job')).exists():
             raise serializers.ValidationError("Invalid Job ID")
         user = User.objects.filter(id=user.id).first()
         email = attrs.get('email')

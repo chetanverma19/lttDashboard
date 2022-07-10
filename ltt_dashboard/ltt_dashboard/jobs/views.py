@@ -85,6 +85,8 @@ class JobViewSet(viewsets.GenericViewSet):
         validated_data['user'] = application_user
         resume = request.FILES.get('resume')
         if resume:
+            if resume.content_type != "application/pdf":
+                return response.Ok(data={"error": "Invalid File Type"}, status=status.HTTP_400_BAD_REQUEST)
             validated_data['resume'] = resume
         query_set = JobApplication.objects.filter(job=application_job, user__id=user.id, is_active=True)
         if query_set.exists() and query_set.first().user != application_user:
