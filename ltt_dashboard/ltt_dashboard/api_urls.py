@@ -15,8 +15,3 @@ default_router.register('auth', UserAuthViewset, basename='auth')
 
 urlpatterns = default_router.urls
 
-#               + [
-#     re_path(r'^auth/register', UserRegisterView.as_view(), name='register-user'),
-#     re_path(r'^auth/verify-email', VerifyEmail.as_view(), name='verify-email'),
-#     re_path(r'^auth/login', LoginAPIView.as_view(), name='user-login')
-# ]

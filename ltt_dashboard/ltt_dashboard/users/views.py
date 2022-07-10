@@ -36,7 +36,7 @@ class UserAuthViewset(viewsets.GenericViewSet):
         user = User.objects.get(email=user_data['email'])
         token = RefreshToken.for_user(user).access_token
         current_site = get_current_site(request).domain
-        relativeLink = reverse('verify-email')
+        relativeLink = reverse('auth-verify-user-email')
         abs_url = f"http://{current_site}{relativeLink}?token={str(token)}"
         email_body = Util.create_verify_message_for_user(user_data, abs_url)
         user_email = user_data.get('email')
