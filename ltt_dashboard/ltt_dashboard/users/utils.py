@@ -27,7 +27,7 @@ class Util:
             "email_body": f"Dear {user_name},\n\nWe regret to inform you but at this moment we have decided not to move"
                           f" forward with you application for the position of {job_name}. We appreciate for selecting "
                           f"LMG for your future endeavours.\n\nPlease feel free to try apply for more open positions "
-                          f"available on our website at https://linusmediagroup.com/jobs\n\nThank You\nLinus Media "
+                          f"available on our website at https://linusmediagroup.com/jobs\n\nThank You\nNOT Linus Media "
                           f"Group"
         }
         return mail
@@ -39,8 +39,19 @@ class Util:
             "email_body": f"Dear Candidate,\n\nWe regret to inform you but at this moment we have decided not to move"
                           f" forward with you application for the position of {job_name}. We appreciate for selecting "
                           f"LMG for your future endeavours.\n\nPlease feel free to try apply for more open positions "
-                          f"available on our website at https://linusmediagroup.com/jobs\n\nThank You\nLinus Media "
+                          f"available on our website at https://linusmediagroup.com/jobs\n\nThank You\nNOT Linus Media "
                           f"Group"
+        }
+        return mail
+
+    @staticmethod
+    def get_application_submission_email(job_name):
+        mail = {
+            "email_subject": f"{job_name} Application Update",
+            "email_body": f"Dear Candidate,\n\nWe have recieved your application for the position of {job_name}."
+                          f"We appreciate for selecting LMG for your future endeavours.\n\nPlease feel free to try "
+                          f"apply for more open positions  available on our website at "
+                          f"https://linusmediagroup.com/jobs\n\nThank You\nNOT Linus Media Group"
         }
         return mail
 

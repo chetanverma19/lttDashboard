@@ -124,9 +124,7 @@ class ApplicationListRequestSerializer(serializers.Serializer):
     job = serializers.ListField(required=False)
     country = serializers.ListField(required=False)
     application_status = serializers.ListField(required=False)
-    job__in = serializers.ListField(required=False)
-    country__in = serializers.ListField(required=False)
-    application_status__in = serializers.ListField(required=False)
+    query_text = serializers.CharField(required=False)
 
     class Meta:
         fields = ['job_type__in']
@@ -138,13 +136,13 @@ class ApplicationListRequestSerializer(serializers.Serializer):
             query_set = Job.objects.filter(id__in=job_id_list)
             if query_set.count() != len(job_id_list):
                 raise serializers.ValidationError('Invalid Job ID')
-            attrs['job__in'] = attrs.pop('job')
+            # attrs['job__in'] = attrs.pop('job')
 
-        if attrs.get('country'):
-            attrs['country__in'] = attrs.pop('country')
+        # if attrs.get('country'):
+        #     attrs['country__in'] = attrs.pop('country')
 
-        if attrs.get('application_status'):
-            attrs['application_status__in'] = attrs.pop('application_status')
+        # if attrs.get('application_status'):
+        #     attrs['application_status__in'] = attrs.pop('application_status')
 
         return attrs
 
@@ -245,26 +243,3 @@ class JobApplicationESSerializer(serializers.ModelSerializer):
     def get_country(obj: JobApplication):
         return obj.country.name
 
-    # @staticmethod
-    # def get_resume(obj: JobApplication):
-    #     print(dir(obj.resume))
-    #     # print(obj.resume.get)
-    #     image_data = bytes(obj.resume.read())
-    #     pdfFileObj = open(image_data, 'rb')
-    #
-    #     # creating a pdf reader object
-    #     pdfReader = PyPDF2.PdfFileReader(pdfFileObj)
-    #
-    #     # printing number of pages in pdf file
-    #     print(pdfReader.numPages)
-    #
-    #     # creating a page object
-    #     pageObj = pdfReader.getPage(0)
-    #
-    #     # extracting text from page
-    #     print(pageObj.extractText())
-    #
-    #     # closing the pdf file object
-    #     pdfFileObj.close()
-    #
-    #     return ""
