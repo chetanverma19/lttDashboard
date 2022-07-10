@@ -15,6 +15,7 @@ from ltt_dashboard.jobs.models import Job, JobApplication, JobType, JobCategorie
 from ltt_dashboard.jobs.serializers import JobSerializer, JobApplicationSerializer, JobListRequestSerializer, \
     JobCreateUpdateSerializer, ApplicationListRequestSerializer, UpdateApplicationSerializer, JobCloseRequestSerializer, \
     EntityActionSerializer, JobActionSerializer, JobTypeSerializer, JobCategoriesSerializer, EntityListSerializer
+from ltt_dashboard.jobs.services import update_application_on_elastic_search
 from ltt_dashboard.users.models import User
 from ltt_dashboard.users.utils import Util
 
@@ -93,7 +94,7 @@ class JobViewSet(viewsets.GenericViewSet):
             if resume.content_type != "application/pdf":
                 return response.Ok(data={"error": "Invalid File Type"}, status=status.HTTP_400_BAD_REQUEST)
             validated_data['resume'] = resume
-            validated_data['resume_cloudinary_url'] = uploader.upload(resume).get('secure_url')
+            # validated_data['resume_cloudinary_url'] = uploader.upload(resume).get('secure_url')
         query_set = JobApplication.objects.filter(job=application_job, user__id=user.id, is_active=True)
         if query_set.exists() and query_set.first().user != application_user:
             return response.Ok(status=status.HTTP_401_UNAUTHORIZED)
@@ -107,6 +108,7 @@ class JobViewSet(viewsets.GenericViewSet):
 
         elif query_set.exists():
             query_set.update(**validated_data)
+            update_application_on_elastic_search(job_id=application_job.id, user_id=application_user.id, resume=resume)
         else:
             JobApplication.objects.update_or_create(**validated_data)
         return response.Ok(status=status.HTTP_202_ACCEPTED)

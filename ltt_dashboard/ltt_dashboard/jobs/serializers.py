@@ -1,3 +1,4 @@
+import PyPDF2
 from django_countries.serializer_fields import CountryField
 from rest_framework import serializers
 from django_countries import serializer_fields
@@ -8,6 +9,7 @@ from ltt_dashboard.departments.serializers import DepartmentSerializer
 from ltt_dashboard.jobs.constants import APPLICATION_STAGE_CHOICES
 from ltt_dashboard.jobs.models import Job, JobType, JobCategories, JobApplication
 from ltt_dashboard.users.models import User
+from ltt_dashboard.users.serializers import UserESSerializer
 
 
 class JobTypeSerializer(serializers.ModelSerializer):
@@ -224,3 +226,45 @@ class JobActionSerializer(serializers.Serializer):
                 raise serializers.ValidationError('Invalid Job Categories')
 
         return attrs
+
+
+class JobApplicationESSerializer(serializers.ModelSerializer):
+
+    job = JobSerializer()
+    user = UserESSerializer()
+    country = serializers.SerializerMethodField()
+    # resume = serializers.SerializerMethodField()
+
+    class Meta:
+        model = JobApplication
+        fields = ['id', 'job', 'user', 'country', 'email', 'phone_number', 'applicant_message', 'last_staff_note',
+                  'application_status']
+
+
+    @staticmethod
+    def get_country(obj: JobApplication):
+        return obj.country.name
+
+    # @staticmethod
+    # def get_resume(obj: JobApplication):
+    #     print(dir(obj.resume))
+    #     # print(obj.resume.get)
+    #     image_data = bytes(obj.resume.read())
+    #     pdfFileObj = open(image_data, 'rb')
+    #
+    #     # creating a pdf reader object
+    #     pdfReader = PyPDF2.PdfFileReader(pdfFileObj)
+    #
+    #     # printing number of pages in pdf file
+    #     print(pdfReader.numPages)
+    #
+    #     # creating a page object
+    #     pageObj = pdfReader.getPage(0)
+    #
+    #     # extracting text from page
+    #     print(pageObj.extractText())
+    #
+    #     # closing the pdf file object
+    #     pdfFileObj.close()
+    #
+    #     return ""

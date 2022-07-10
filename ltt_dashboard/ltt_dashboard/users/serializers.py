@@ -67,3 +67,10 @@ class LoginSerializer(serializers.ModelSerializer):
             "user_name": user.user_name,
             "tokens": user.tokens()
         }
+
+
+class UserESSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = User
+        fields = ['id', 'full_name', 'email', 'user_name', 'is_staff', 'is_active', 'date_joined', 'is_verified']

@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'ltt_dashboard.departments',
     'ltt_dashboard.jobs',
     'ltt_dashboard.users',
+    'ltt_dashboard.app_config',
 ]
 
 MIDDLEWARE = [
