@@ -23,7 +23,7 @@ class Util:
     @staticmethod
     def get_rejection_email(user_name, job_name):
         mail = {
-            "email_subject": f"{job_name} Application Update",
+            "email_subject": f"{job_name} Application Received",
             "email_body": f"Dear {user_name},\n\nWe regret to inform you but at this moment we have decided not to move"
                           f" forward with you application for the position of {job_name}. We appreciate for selecting "
                           f"LMG for your future endeavours.\n\nPlease feel free to try apply for more open positions "
