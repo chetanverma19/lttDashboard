@@ -39,6 +39,7 @@ class JobApplicationSerializer(serializers.ModelSerializer):
 
     job = JobSerializer()
     country = serializers.SerializerMethodField()
+    resume = serializers.SerializerMethodField()
 
     class Meta:
         model = JobApplication
@@ -48,6 +49,10 @@ class JobApplicationSerializer(serializers.ModelSerializer):
     @staticmethod
     def get_country(obj: JobApplication):
         return obj.country.name
+
+    @staticmethod
+    def get_resume(obj: JobApplication):
+        return obj.resume_cloudinary_url
 
 
 class JobListRequestSerializer(serializers.Serializer):

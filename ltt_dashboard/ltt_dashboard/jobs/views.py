@@ -1,3 +1,4 @@
+import cloudinary.uploader as uploader
 from django.db.models import Count
 from django.shortcuts import render
 from rest_framework import viewsets, status
@@ -22,8 +23,12 @@ class JobViewSet(viewsets.GenericViewSet):
     permission_classes = (permissions.IsAuthenticated,)
     queryset = ''
 
-    @action(detail=False, methods=['get'], url_path='test')
+    @action(detail=False, methods=['get', 'post'], url_path='test')
     def get_test_response(self, request, *args, **kwargs):
+        file = request.FILES.get('resume')
+        if file:
+            url = uploader.upload(file).get('secure_url')
+            print(url)
         return response.Ok(status=status.HTTP_408_REQUEST_TIMEOUT)
 
     @action(detail=False, methods=['post'], url_path='job-list')
@@ -88,6 +93,7 @@ class JobViewSet(viewsets.GenericViewSet):
             if resume.content_type != "application/pdf":
                 return response.Ok(data={"error": "Invalid File Type"}, status=status.HTTP_400_BAD_REQUEST)
             validated_data['resume'] = resume
+            validated_data['resume_cloudinary_url'] = uploader.upload(resume).get('secure_url')
         query_set = JobApplication.objects.filter(job=application_job, user__id=user.id, is_active=True)
         if query_set.exists() and query_set.first().user != application_user:
             return response.Ok(status=status.HTTP_401_UNAUTHORIZED)

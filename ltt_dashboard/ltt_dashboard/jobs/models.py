@@ -64,6 +64,7 @@ class JobApplication(TimeStampedUUIDModel):
     phone_number = models.CharField(_('phone number'), null=True, blank=True, db_index=True, max_length=15,
                                     help_text='Include the country code.')
     resume = models.FileField(_("Resume"), upload_to=upload_to, null=True, blank=True)
+    resume_cloudinary_url = models.URLField(_("Resume URL"), null=True, blank=True)
     applicant_message = models.TextField(_("Applicant Message"), max_length=1024, null=True, blank=True)
     last_staff_note = models.TextField(_("Latest Note By Staff"), max_length=1024, null=True, blank=True)
     application_status = models.CharField(_("Application Status"), db_index=True, choices=APPLICATION_STAGE_CHOICES,

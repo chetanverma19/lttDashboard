@@ -13,12 +13,12 @@ https://docs.djangoproject.com/en/2.2/ref/settings/
 import os
 from datetime import timedelta
 
+import cloudinary
 import environ
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 env = environ.Env()
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
@@ -144,7 +144,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/2.2/topics/i18n/
 
@@ -158,6 +157,13 @@ USE_L10N = True
 
 USE_TZ = True
 
+cloudinary.config(
+    cloud_name=env.str("CLOUDINARY_CLOUD_NAME", default=""),
+    api_key=env.str("CLOUDINARY_API_KEY", default=""),
+    api_secret=env.str("CLOUDINARY_API_SECRET", default="")
+)
+
+config = cloudinary.config(secure=True)
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
