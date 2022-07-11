@@ -121,8 +121,8 @@ DATABASES = {
 DATABASES['default']['ATOMIC_REQUESTS'] = True
 DATABASES['default']['CONN_MAX_AGE'] = 10
 
-GDAL_LIBRARY_PATH = os.getenv('GDAL_LIBRARY_PATH')
-GEOS_LIBRARY_PATH = os.getenv('GEOS_LIBRARY_PATH')
+import dj_database_url
+DATABASES['default'] = dj_database_url.config()
 
 REST_FRAMEWORK = {
     'NON_FIELD_ERRORS_KEY': 'error',
