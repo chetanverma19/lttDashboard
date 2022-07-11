@@ -272,25 +272,22 @@ class JobManagementViewset(viewsets.GenericViewSet):
         if request.method == 'POST':
             tmp_job_obj = Job.objects.filter(name=name, display_name=display_name).first()
             if tmp_job_obj:
-                JobExtraField.objects.filter(job=tmp_job_obj).delete()
-                tmp_job_obj.delete()
                 job_type = JobType.objects.filter(id=job_type).first()
                 department = Department.objects.filter(id=department).first()
                 categories = JobCategories.objects.filter(id__in=categories).all()
-                job_obj: Job = Job(
-                    name=name,
-                    display_name=display_name,
-                    description=description,
-                    job_type=job_type,
-                    department=department,
-                    is_remote=is_remote,
-                )
-                job_obj.categories.set(categories)
-                job_obj.save()
+                tmp_job_obj.name = name
+                tmp_job_obj.display_name = display_name
+                tmp_job_obj.description = description
+                tmp_job_obj.job_type = job_type
+                tmp_job_obj.department = department
+                tmp_job_obj.is_remote = is_remote
+                tmp_job_obj.categories.set(categories)
+                tmp_job_obj.save()
+                JobExtraField.objects.filter(job=tmp_job_obj).delete()
                 if extra_fields:
                     for extra_field in extra_fields:
                         JobExtraField.objects.create(
-                            job=job_obj,
+                            job=tmp_job_obj,
                             heading=extra_field.get('heading'),
                             description=extra_field.get('description')
                         )
