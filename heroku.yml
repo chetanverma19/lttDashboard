@@ -1,5 +1,5 @@
 setup:
-  config:
+  config: {}
 
 build:
   packages:
