@@ -1,9 +1,9 @@
 build:
   packages:
     - gdal-bin
-    languages:
-      - nodejs
-      - python-3.9.12
+  languages:
+    - nodejs
+    - python-3.9.12
 run:
   web: python manage.py runserver 0.0.0.0:8070
   release: python manage.py migrate
