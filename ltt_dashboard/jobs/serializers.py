@@ -191,6 +191,8 @@ class EntityActionSerializer(serializers.Serializer):
 
 class EntityListSerializer(serializers.Serializer):
     entity_type = serializers.CharField()
+    entity_name = serializers.CharField()
+    entity_display_name = serializers.CharField()
 
     def validate(self, attrs):
         entity_type = attrs.get('entity_type')

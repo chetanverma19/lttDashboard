@@ -248,6 +248,8 @@ class JobManagementViewset(viewsets.GenericViewSet):
                 model = JobType
             elif entity_type == 'job_categories':
                 model = JobCategories
+            print(model)
+            print(entity_name, entity_display_name)
             if model.objects.filter(name=entity_name).exists() or model.objects.filter(
                     display_name=entity_display_name).exists():
                 return response.Ok(data={"error": "Entity Already Exists"}, status=status.HTTP_400_BAD_REQUEST)

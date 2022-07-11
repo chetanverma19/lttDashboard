@@ -2,27 +2,7 @@
 ltt_dashboard/.venv/
 db.sqlite3
 .env
-*.log
-
-*.pot
-
-*.pyc
-
-*/*/*/.idea/
-
-*/*/.idea/
-
-*/.idea/
-
-.idea/
-
-../.idea/
-
-*/*/*/__pycache__/
-
-*/*/__pycache__/
-
-*/__pycache__/
+__pycache__/
 
 
 # Created by https://www.gitignore.io/api/vim,node,macos,linux,django,python,vagrant,ansible,windows,pycharm,sublimetext,visualstudiocode
