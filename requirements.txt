@@ -16,3 +16,4 @@ PyPDF2==2.5.0
 django-on-heroku==1.1.2
 gunicorn
 whitenoise
+dj-database-url
