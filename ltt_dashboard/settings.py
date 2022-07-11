@@ -117,8 +117,8 @@ SIMPLE_JWT = {
 DATABASES = {
     'default': env.db('DATABASE_URL', default='postgis://localhost/farmstock'),
 }
-
-DATABASES['default']['ENGINE'] = 'django.contrib.gis.db.backends.postgis'
+import dj_database_url
+DATABASES['default'] =  dj_database_url.config()
 DATABASES['default']['ATOMIC_REQUESTS'] = True
 DATABASES['default']['CONN_MAX_AGE'] = 10
 
