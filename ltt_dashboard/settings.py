@@ -176,6 +176,8 @@ config = cloudinary.config(secure=True)
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
+STATIC_ROOT = env("STATIC_ROOT")
+
 STATIC_URL = '/static/'
 
 EMAIL_USE_TLS = True
