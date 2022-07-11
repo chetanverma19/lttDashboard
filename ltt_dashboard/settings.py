@@ -124,6 +124,9 @@ DATABASES['default']['CONN_MAX_AGE'] = 10
 import dj_database_url
 DATABASES['default'] = dj_database_url.config()
 
+GDAL_LIBRARY_PATH = os.environ.get('GDAL_LIBRARY_PATH')
+GEOS_LIBRARY_PATH = os.environ.get('GEOS_LIBRARY_PATH')
+
 REST_FRAMEWORK = {
     'NON_FIELD_ERRORS_KEY': 'error',
     'DEFAULT_AUTHENTICATION_CLASSES': (
