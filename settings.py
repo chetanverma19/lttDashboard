@@ -177,7 +177,7 @@ config = cloudinary.config(secure=True)
 
 # STATIC_ROOT = env.str("STATIC_ROOT")
 
-STATIC_URL = '/static/'
+STATIC_URL = 'static/'
 
 EMAIL_USE_TLS = True
 EMAIL_HOST = 'smtp.gmail.com'
