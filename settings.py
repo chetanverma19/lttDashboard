@@ -26,7 +26,9 @@ env = environ.Env()
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = env.str('SECRET_KEY', default='')
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['localhost', 'chetanverma-hiring-backend.herokuapp.com']
+
+CSRF_TRUSTED_ORIGINS = ['localhost', 'chetanverma-hiring-backend.herokuapp.com']
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -188,4 +190,6 @@ EMAIL_HOST_PASSWORD = env.str('EMAIL_HOST_PASSWORD', default='admin')
 # import django_on_heroku
 # django_on_heroku.settings(locals(), staticfiles=False)
 
-print(DATABASES)
+# print(DATABASES)
+
+print("Using user specified settings")
