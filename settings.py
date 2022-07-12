@@ -118,10 +118,10 @@ DATABASES = {
     'default': env.db('DATABASE_2_URL', default='postgis://localhost/ltt_v1'),
 }
 
-# import dj_database_url
-#
-# DATABASES['default'] = dj_database_url.config()
-# DATABASES['default']['ENGINE'] = 'django.contrib.gis.db.backends.postgis'
+import dj_database_url
+
+DATABASES['default'] = dj_database_url.config()
+DATABASES['default']['ENGINE'] = 'django.contrib.gis.db.backends.postgis'
 DATABASES['default']['ATOMIC_REQUESTS'] = True
 DATABASES['default']['CONN_MAX_AGE'] = 10
 
