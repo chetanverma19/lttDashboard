@@ -28,7 +28,7 @@ SECRET_KEY = env.str('SECRET_KEY', default='')
 
 ALLOWED_HOSTS = ['localhost', 'chetanverma-hiring-backend.herokuapp.com']
 
-CSRF_TRUSTED_ORIGINS = ['localhost', 'chetanverma-hiring-backend.herokuapp.com']
+CSRF_TRUSTED_ORIGINS = ['https://localhost', 'https://chetanverma-hiring-backend.herokuapp.com']
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
