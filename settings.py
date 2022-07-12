@@ -31,6 +31,8 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['localhost', 'chetanverma-hiring-backend.herokuapp.com']
 
+print(ALLOWED_HOSTS)
+
 AUTH_USER_MODEL = 'users.User'
 
 # Application definition
@@ -186,6 +188,6 @@ EMAIL_PORT = 587
 EMAIL_HOST_USER = env.str('EMAIL_HOST_USER', default='admin')
 EMAIL_HOST_PASSWORD = env.str('EMAIL_HOST_PASSWORD', default='admin')
 
-import django_on_heroku
-django_on_heroku.settings(locals(), db_ssl_required=False)
+# import django_on_heroku
+# django_on_heroku.settings(locals(), db_ssl_required=False)
 

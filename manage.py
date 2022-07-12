@@ -23,7 +23,7 @@ if __name__ == '__main__':
     # Read .env file and set key/value inside it as environement variables
     load_dotenv(os.path.join(os.path.dirname(__file__), '.env'))
 
-    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "ltt_dashboard.settings")
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "settings")
 
     execute_from_command_line(sys.argv)
     # main()
