@@ -29,7 +29,7 @@ SECRET_KEY = env.str('SECRET_KEY', default='')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', 'chetanverma-hiring-backend.herokuapp.com']
+ALLOWED_HOSTS = ['*']
 
 print(ALLOWED_HOSTS)
 
