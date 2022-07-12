@@ -17,7 +17,7 @@ import cloudinary
 import environ
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-# BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 env = environ.Env()
 
 # Quick-start development settings - unsuitable for production
@@ -185,6 +185,6 @@ EMAIL_PORT = 587
 EMAIL_HOST_USER = env.str('EMAIL_HOST_USER', default='admin')
 EMAIL_HOST_PASSWORD = env.str('EMAIL_HOST_PASSWORD', default='admin')
 
-# import django_on_heroku
-# django_on_heroku.settings(locals(), db_ssl_required=False)
+import django_on_heroku
+django_on_heroku.settings(locals())
 
